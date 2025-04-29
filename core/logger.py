@@ -13,13 +13,18 @@ class Logger:
         os.makedirs(self.log_dir, exist_ok=True)
 
         # Configura o logger do Python
-        log_file = os.path.join(self.log_dir, "app.log")
+        self.log_file = os.path.join(self.log_dir, "app.log")
         self.logger = logging.getLogger("OrganizadorDePastas")
         self.logger.setLevel(logging.INFO)
 
         # Evita duplicação de handlers
         if not self.logger.handlers:
-            file_handler = logging.FileHandler(log_file, encoding='utf-8')
+            # Remove handlers antigos se existirem
+            for handler in self.logger.handlers[:]:
+                self.logger.removeHandler(handler)
+
+            # Cria um novo handler
+            file_handler = logging.FileHandler(self.log_file, encoding='utf-8')
             formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
             file_handler.setFormatter(formatter)
             self.logger.addHandler(file_handler)
@@ -47,3 +52,26 @@ class Logger:
 
         if self.db:
             self.db.add_log(f"AVISO - {action}", details)
+
+    def clear_log_file(self):
+        """Limpa o arquivo de log (não afeta o banco de dados)."""
+        try:
+            # Fecha handlers existentes
+            for handler in self.logger.handlers[:]:
+                handler.close()
+                self.logger.removeHandler(handler)
+
+            # Limpa o arquivo
+            with open(self.log_file, 'w', encoding='utf-8') as f:
+                f.write('')
+
+            # Recria o handler
+            file_handler = logging.FileHandler(self.log_file, encoding='utf-8')
+            formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+            file_handler.setFormatter(formatter)
+            self.logger.addHandler(file_handler)
+
+            return True
+        except Exception as e:
+            print(f"Erro ao limpar arquivo de log: {e}")
+            return False

@@ -25,7 +25,7 @@ Aplicativo para monitorar e organizar arquivos automaticamente em pastas especí
 1. Clone o repositório:
 ```
 git clone git@github.com:AlexsandroAF/FileOrganization.git
-cd organizador-pastas
+cd FileOrganization
 ```
 
 2. Instale as dependências:
